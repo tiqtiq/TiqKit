@@ -13,9 +13,21 @@ let package = Package(
     targets: [
         .target(
             name: "TiqKit",
-            dependencies: []),
+            dependencies: [],
+            swiftSettings: [
+                .unsafeFlags([
+                    "-Xfrontend",
+                    "-enable-experimental-concurrency"
+                ])
+            ]),
         .testTarget(
             name: "TiqKitTests",
-            dependencies: ["TiqKit"]),
+            dependencies: ["TiqKit"],
+            swiftSettings: [
+                .unsafeFlags([
+                    "-Xfrontend",
+                    "-enable-experimental-concurrency"
+                ])
+            ])
     ]
 )
