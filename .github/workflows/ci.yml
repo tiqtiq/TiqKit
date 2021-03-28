@@ -14,12 +14,17 @@ jobs:
     #runs-on: ubuntu-latest
     runs-on: ubuntu-20.04
     steps:
-      - name: Download Swift 5.5
-        run: wget https://swift.org/builds/development/ubuntu2004/swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a/swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a-ubuntu20.04.tar.gz
-      - name: Extract Swift
-        run: tar xzf swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a-ubuntu20.04.tar.gz
+      - name: Configure Swift 5.5 Snapshot
+        run: echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
+
+      - name: Download Swift Snapshot
+        run: wget "https://swift.org/builds/development/ubuntu2004/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
+
+      - name: Extract Swift Snapshot
+        run: tar xzf "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
+
       - name: Add Path
-        run: echo "::add-path::$GITHUB_WORKSPACE/swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a-ubuntu20.04/usr/bin"
+        run: echo "::add-path::$GITHUB_WORKSPACE/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04/usr/bin"
 
       - uses: actions/checkout@v2
       - run: swift test --enable-test-discovery
