@@ -30,11 +30,15 @@ jobs:
         if: steps.swift-snapshot-cache.outputs.cache-hit != 'true'
         run: |
           curl -sLO "https://swift.org/builds/development/ubuntu2004/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
-          tar xvzf "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
+          tar xzf "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
           mv "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz" "swift-DEVELOPMENT-SNAPSHOT"
 
       - name: Swift Test
-        run: ./swift-DEVELOPMENT-SNAPSHOT/usr/bin/swift test --enable-test-discovery
+        run: |
+          la -la 
+          ls -la swift-*
+          ls -la swift-DEVELOPMENT-SNAPSHOT
+          ./swift-DEVELOPMENT-SNAPSHOT/usr/bin/swift test --enable-test-discovery
 
   watchOS:
     if: false # disabled until we can work around missing XCTest in non-xcodeproj SPM module
