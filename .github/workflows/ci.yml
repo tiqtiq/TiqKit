@@ -103,7 +103,7 @@ jobs:
         run: swift test
 
   Windows10:
-    if: false # disabled until Swift-5.5 async/await
+    #if: false # disabled until Swift-5.5 async/await
     runs-on: windows-latest
     needs: [Linux] # Linux must pass first
     steps:
