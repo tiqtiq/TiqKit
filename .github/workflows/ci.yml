@@ -105,7 +105,7 @@ jobs:
   Windows10:
     #if: false # disabled until Swift-5.5 async/await
     runs-on: windows-latest
-    #needs: [Linux] # Linux must pass first
+    needs: [Linux] # Linux must pass first
     steps:
       - uses: actions/checkout@v2
       - uses: seanmiddleditch/gha-setup-vsdevenv@master
