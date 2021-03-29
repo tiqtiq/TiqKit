@@ -37,7 +37,7 @@ jobs:
         run: |
           ls -la 
           ls -la swift-*
-          ls -la swift-DEVELOPMENT-SNAPSHOT
+          find swift-DEVELOPMENT-SNAPSHOT/
           ./swift-DEVELOPMENT-SNAPSHOT/usr/bin/swift test --enable-test-discovery
 
   watchOS:
