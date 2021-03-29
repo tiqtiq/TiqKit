@@ -28,8 +28,9 @@ jobs:
 
       - name: Download Swift Snapshot
         if: steps.swift-snapshot-cache.outputs.cache-hit != 'true'
-        run: curl -L -o "swift-snapshot.tar.gz" "https://swift.org/builds/development/ubuntu2004/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
-        run: tar xzf "swift-snapshot.tar.gz"
+        run: |
+          curl -s -L -o "swift-snapshot.tar.gz" "https://swift.org/builds/development/ubuntu2004/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
+          tar xzf "swift-snapshot.tar.gz"
 
 
       - name: Swift Test
