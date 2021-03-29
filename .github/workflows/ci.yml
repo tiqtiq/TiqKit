@@ -17,13 +17,15 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Configure Swift 5.5 Snapshot
-        run: echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
+        run: |
+          echo "SWIFT_SNAPNAME=swift-DEVELOPMENT-SNAPSHOT" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
       - name: Swift 5.5 Download Cache
         id: swift-snapshot-cache
         uses: actions/cache@v2
         with:
-          path: "./swift-snapshot"
+          path: "./${{ env.SWIFT_SNAPNAME }}"
           key: "${{ env.SWIFT_SNAPSHOT }}"
 
       - name: Download Swift Snapshot
@@ -31,14 +33,11 @@ jobs:
         run: |
           curl -sLO "https://swift.org/builds/development/ubuntu2004/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
           tar xzf "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz"
-          mv "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04.tar.gz" "swift-DEVELOPMENT-SNAPSHOT"
+          mv "${{ env.SWIFT_SNAPSHOT }}-ubuntu20.04" "${{ env.SWIFT_SNAPNAME }}"
 
       - name: Swift Test
         run: |
-          ls -la 
-          ls -la swift-*
-          find swift-DEVELOPMENT-SNAPSHOT/
-          ./swift-DEVELOPMENT-SNAPSHOT/usr/bin/swift test --enable-test-discovery
+          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" test --enable-test-discovery
 
   watchOS:
     if: false # disabled until we can work around missing XCTest in non-xcodeproj SPM module
