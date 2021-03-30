@@ -85,7 +85,6 @@ jobs:
               ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
 
   macOS10:
-    if: false # awaiting fix for: "Library not loaded: /usr/lib/swift/libswift_Concurrency.dylib"
     runs-on: macos-10.15
     needs: [Linux] # Linux must pass first
     steps:
@@ -113,11 +112,16 @@ jobs:
 
       - name: Swift Test
         run: |
-          export DYLD_LIBRARY_PATH=$(dirname $(xcrun --toolchain swift --find swift))/../lib/swift/macosx
-          ls -la $DYLD_LIBRARY_PATH
+          swift package generate-xcodeproj
+          xcrun --toolchain swift xcodebuild -scheme TiqKit-Package test
 
-          xcrun --toolchain swift swift --version
-          xcrun --toolchain swift swift test -Xswiftc -Xfrontend -Xswiftc -enable-experimental-concurrency
+          # Not yet working: "Library not loaded: /usr/lib/swift/libswift_Concurrency.dylib"
+
+          #export DYLD_LIBRARY_PATH=$(dirname $(xcrun --toolchain swift --find swift))/../lib/swift/macosx
+          #ls -la $DYLD_LIBRARY_PATH
+
+          #xcrun --toolchain swift swift --version
+          #xcrun --toolchain swift swift test -Xswiftc -Xfrontend -Xswiftc -enable-experimental-concurrency
           # xcrun --toolchain swift swift test -v --configuration debug --enable-test-discovery -Xfrontend -enable-experimental-concurrency
 
   macOS11:
