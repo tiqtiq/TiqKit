@@ -20,71 +20,6 @@ final class TiqKitTests: XCTestCase {
 
         XCTAssertEqual(1+2+3, awaitAsync(f: { await addUp() }))
     }
-
-    func testNetworkSync() throws {
-        func downloadURLsLikeWeUsedToDoInTheOldenDays() throws -> Int {
-            let data1 = try Data(contentsOf: URL(string: "https://www.example.org")!)
-            let data2 = try Data(contentsOf: URL(string: "https://www.example.net")!)
-            let data3 = try Data(contentsOf: URL(string: "https://www.example.com")!)
-            return data1.count + data2.count + data3.count
-        }
-
-        let sum = try downloadURLsLikeWeUsedToDoInTheOldenDays()
-        XCTAssertEqual(3768, sum)
-    }
-
-    func testNetworkAsync() throws {
-        /// Downloads the given URL using `URLSession.shared`
-        func downloadURL(string: String) async throws -> Data {
-            try await URLRequest(url: URL(string: string)!).fetch().data
-        }
-
-        func downloadURLs() async throws -> Int {
-            let data1 = try await downloadURL(string: "https://www.example.org")
-            let data2 = try await downloadURL(string: "https://www.example.net")
-            let data3 = try await downloadURL(string: "https://www.example.com")
-            return data1.count + data2.count + data3.count
-        }
-
-        let sum = awaitingResult { try await downloadURLs() }
-
-        XCTAssertEqual(3768, try sum.get())
-    }
-}
-
-
-extension URLRequest {
-    enum FetchError : Error {
-        case noResponse
-        case nonHTTPResponse(URLResponse)
-        case unsuccessfulResponse(HTTPURLResponse, Data?)
-    }
-
-    /// Downloads the data for this request with the given session asynchronously, returning the response and data together
-    func fetch(session: URLSession = .shared) async throws -> (response: HTTPURLResponse, data: Data) {
-        try await withCheckedThrowingContinuation { continuation in
-            URLSession.shared.dataTask(with: self) { (data, response, error) in
-                if let error = error {
-                    return continuation.resume(throwing: error)
-                }
-
-                guard let httpRes = response as? HTTPURLResponse else {
-                    if let response = response {
-                        return continuation.resume(throwing: FetchError.nonHTTPResponse(response))
-                    } else {
-                        return continuation.resume(throwing: FetchError.noResponse)
-                    }
-                }
-
-                guard let data = data, httpRes.statusCode == 200 else {
-                    return continuation.resume(throwing: FetchError.unsuccessfulResponse(httpRes, data))
-                }
-
-                print("returning data", data.count, "for", httpRes.url as Any, "on", Thread.current)
-                return continuation.resume(returning: (httpRes, data))
-            }.resume()
-        }
-    }
 }
 
 public extension XCTestCase {
@@ -120,3 +55,74 @@ public extension XCTestCase {
         completion(await(f()))
     }
 }
+
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+
+extension TiqKitTests {
+    func testNetworkSync() throws {
+        func downloadURLsLikeWeUsedToDoInTheOldenDays() throws -> Int {
+            let data1 = try Data(contentsOf: URL(string: "https://www.example.org")!)
+            let data2 = try Data(contentsOf: URL(string: "https://www.example.net")!)
+            let data3 = try Data(contentsOf: URL(string: "https://www.example.com")!)
+            return data1.count + data2.count + data3.count
+        }
+
+        let sum = try downloadURLsLikeWeUsedToDoInTheOldenDays()
+
+        XCTAssertGreaterThan(sum, 100, "page size check")
+    }
+
+    func testNetworkAsync() throws {
+        /// Downloads the given URL using `URLSession.shared`
+        func downloadURL(string: String) async throws -> Data {
+            try await URLRequest(url: URL(string: string)!).fetch().data
+        }
+
+        func downloadURLs() async throws -> Int {
+            let data1 = try await downloadURL(string: "https://www.example.org")
+            let data2 = try await downloadURL(string: "https://www.example.net")
+            let data3 = try await downloadURL(string: "https://www.example.com")
+            return data1.count + data2.count + data3.count
+        }
+
+        let sum = awaitingResult { try await downloadURLs() }
+
+        XCTAssertGreaterThan(sum, 100, "page size check")
+    }
+}
+
+extension URLRequest {
+    enum FetchError : Error {
+        case noResponse
+        case nonHTTPResponse(URLResponse)
+        case unsuccessfulResponse(HTTPURLResponse, Data?)
+    }
+
+    /// Downloads the data for this request with the given session asynchronously, returning the response and data together
+    func fetch(session: URLSession = .shared) async throws -> (response: HTTPURLResponse, data: Data) {
+        try await withCheckedThrowingContinuation { continuation in
+            URLSession.shared.dataTask(with: self) { (data, response, error) in
+                if let error = error {
+                    return continuation.resume(throwing: error)
+                }
+
+                guard let httpRes = response as? HTTPURLResponse else {
+                    if let response = response {
+                        return continuation.resume(throwing: FetchError.nonHTTPResponse(response))
+                    } else {
+                        return continuation.resume(throwing: FetchError.noResponse)
+                    }
+                }
+
+                guard let data = data, httpRes.statusCode == 200 else {
+                    return continuation.resume(throwing: FetchError.unsuccessfulResponse(httpRes, data))
+                }
+
+                print("returning data", data.count, "for", httpRes.url as Any, "on", Thread.current)
+                return continuation.resume(returning: (httpRes, data))
+            }.resume()
+        }
+    }
+}
+#endif // canImport(FoundationNetworking)
