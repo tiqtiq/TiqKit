@@ -84,13 +84,44 @@ jobs:
               ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
 
   macOS10:
-    if: false # disabled until Swift-5.5 async/await
     runs-on: macos-10.15
     needs: [Linux] # Linux must pass first
     steps:
       - uses: actions/checkout@v2
-      - name: Run tests
-        run: swift test
+
+      - name: Configure Swift Snapshot 
+        run: |
+          echo "SWIFT_SNAPNAME=swift-DEVELOPMENT-SNAPSHOT" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
+
+      - name: Cache Swift Snapshot
+        id: swift-snapshot-cache
+        uses: actions/cache@v2
+        with:
+          path: "./${{ env.SWIFT_SNAPNAME }}"
+          key: "${{ env.SWIFT_SNAPSHOT }}"
+
+      - name: Download Swift Snapshot
+        if: steps.swift-snapshot-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir "${{ env.SWIFT_SNAPNAME }}"
+          cd "${{ env.SWIFT_SNAPNAME }}"
+           
+          echo "Downloading…"
+          curl -sLO "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
+           
+          echo "Unpacking…"
+          xar -x -f "${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
+           
+          echo "Extracting…"
+          cat "${{ env.SWIFT_SNAPSHOT }}-osx-package.pkg/Payload" | gunzip - | cpio -i -d
+           
+          cd ..
+          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" -version
+
+      - name: Swift Test
+        run: |
+          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" test --enable-test-discovery
 
   macOS11:
     if: false # disabled until Swift-5.5 async/await
