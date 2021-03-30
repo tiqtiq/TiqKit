@@ -94,29 +94,26 @@ jobs:
         run: |
           echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
-      - name: Install Swift Snapshot
-        run: |
-          curl -sL -o 'swift-installer.pkg' "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
-          sudo installer -pkg 'swift-installer.pkg' -target /
+      - name: Swift 5.5 Download Cache
+        id: swift-snapshot-cache
+        uses: actions/cache@v2
+        with:
+          path: "./${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
+          key: "${{ env.SWIFT_SNAPSHOT }}-macos"
 
-      - name: Update Path
+      - name: Download Swift Snapshot
+        if: steps.swift-snapshot-cache.outputs.cache-hit != 'true'
         run: |
-          ls -la "/Library/Developer/Toolchains/"
-          echo "/Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/" >> $GITHUB_PATH
+          curl -sL -o "${{ env.SWIFT_SNAPSHOT }}-osx.pkg" "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
 
       - name: Setup Snapshot
         run: |
-          sudo install_name_tool -add_rpath @executable_path/../lib/swift/macosx /Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/swift-build
-          sudo install_name_tool -add_rpath @executable_path/../lib/swift/macosx /Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/swift-test
-
-           
-      - name: Swift Version (Post)
-        run: |
-          swift --version
+          sudo installer -pkg "${{ env.SWIFT_SNAPSHOT }}-osx.pkg" -target /
 
       - name: Swift Test
         run: |
-          swift test
+          xcrun --toolchain swift swift --version
+          xcrun --toolchain swift swift test
 
   macOS11:
     if: false # disabled until Swift-5.5 async/await
