@@ -93,8 +93,6 @@ jobs:
         run: |
           echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
-      - name: Cache Swift Snapshot
-
       - name: Install Swift Snapshot
         run: |
           curl -sLO "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
@@ -102,6 +100,7 @@ jobs:
 
       - name: Update Path
         run: |
+          ls -la "/Library/Developer/Toolchains/"
           echo "/Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/" >> $GITHUB_PATH
            
       - name: Swift Version (Post)
