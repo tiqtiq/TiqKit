@@ -1,6 +1,7 @@
 name: TiqKit CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
@@ -102,6 +103,12 @@ jobs:
         run: |
           ls -la "/Library/Developer/Toolchains/"
           echo "/Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/" >> $GITHUB_PATH
+
+      - name: Setup Snapshot
+        run: |
+          sudo install_name_tool -add_rpath @executable_path/../lib/swift/macosx /Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/swift-build
+          sudo install_name_tool -add_rpath @executable_path/../lib/swift/macosx /Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/swift-test
+
            
       - name: Swift Version (Post)
         run: |
