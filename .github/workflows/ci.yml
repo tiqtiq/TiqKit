@@ -91,36 +91,26 @@ jobs:
 
       - name: Configure Swift Snapshot 
         run: |
-          echo "SWIFT_SNAPNAME=swift-DEVELOPMENT-SNAPSHOT" >> $GITHUB_ENV
           echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
       - name: Cache Swift Snapshot
-        id: swift-snapshot-cache
-        uses: actions/cache@v2
-        with:
-          path: "./${{ env.SWIFT_SNAPNAME }}"
-          key: "${{ env.SWIFT_SNAPSHOT }}-windows"
 
-      - name: Download Swift Snapshot
-        if: steps.swift-snapshot-cache.outputs.cache-hit != 'true'
+      - name: Install Swift Snapshot
         run: |
-          mkdir "${{ env.SWIFT_SNAPNAME }}"
-          cd "${{ env.SWIFT_SNAPNAME }}"
-           
-          echo "Downloading…"
           curl -sLO "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
+          sudo installer -pkg "${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg" -target /
+
+      - name: Update Path
+        run: |
+          echo "/Library/Developer/Toolchains/${{ env.SWIFT_SNAPSHOT }}.xctoolchain/usr/bin/" >> $GITHUB_PATH
            
-          echo "Unpacking…"
-          xar -x -f "${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
-           
-          echo "Extracting…"
-          cat "${{ env.SWIFT_SNAPSHOT }}-osx-package.pkg/Payload" | gunzip - | cpio -i -d
-           
-          cd ..
-          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" -version
+      - name: Swift Version (Post)
+        run: |
+          swift --version
 
       - name: Swift Test
         run: |
+          swift --version
           "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" test --enable-test-discovery
 
   macOS11:
