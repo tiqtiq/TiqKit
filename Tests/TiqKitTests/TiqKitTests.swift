@@ -88,7 +88,7 @@ extension TiqKitTests {
 
         let sum = awaitingResult { try await downloadURLs() }
 
-        XCTAssertGreaterThan(sum, 100, "page size check")
+        XCTAssertGreaterThan(try sum.get(), 100, "page size check")
     }
 }
 
