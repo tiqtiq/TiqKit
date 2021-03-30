@@ -20,7 +20,7 @@ jobs:
       - name: Configure Swift Snapshot
         run: |
           echo "SWIFT_SNAPNAME=swift-DEVELOPMENT-SNAPSHOT" >> $GITHUB_ENV
-          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-21-a" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
       - name: Swift Snapshot Download Cache
         id: swift-snapshot-cache
@@ -85,6 +85,7 @@ jobs:
               ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
 
   macOS10:
+    if: false # awaiting fix for: "Library not loaded: /usr/lib/swift/libswift_Concurrency.dylib"
     runs-on: macos-10.15
     needs: [Linux] # Linux must pass first
     steps:
@@ -92,7 +93,7 @@ jobs:
 
       - name: Configure Swift Snapshot 
         run: |
-          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-21-a" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
 
       - name: Swift Snapshot Download Cache
         id: swift-snapshot-cache
