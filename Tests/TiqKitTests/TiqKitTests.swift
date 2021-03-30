@@ -60,6 +60,7 @@ public extension XCTestCase {
 import FoundationNetworking
 
 extension TiqKitTests {
+    #if !os(Windows) // crashes with swift-DEVELOPMENT-SNAPSHOT-2021-02-18-a
     func testNetworkSync() throws {
         func downloadURLsLikeWeUsedToDoInTheOldenDays() throws -> Int {
             let data1 = try Data(contentsOf: URL(string: "https://www.example.org")!)
@@ -72,6 +73,7 @@ extension TiqKitTests {
 
         XCTAssertGreaterThan(sum, 100, "page size check")
     }
+    #endif
 
     func testNetworkAsync() throws {
         /// Downloads the given URL using `URLSession.shared`
