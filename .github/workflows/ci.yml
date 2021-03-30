@@ -20,7 +20,7 @@ jobs:
       - name: Configure Swift Snapshot
         run: |
           echo "SWIFT_SNAPNAME=swift-DEVELOPMENT-SNAPSHOT" >> $GITHUB_ENV
-          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-21-a" >> $GITHUB_ENV
 
       - name: Swift Snapshot Download Cache
         id: swift-snapshot-cache
@@ -92,7 +92,7 @@ jobs:
 
       - name: Configure Swift Snapshot 
         run: |
-          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-25-a" >> $GITHUB_ENV
+          echo "SWIFT_SNAPSHOT=swift-DEVELOPMENT-SNAPSHOT-2021-03-21-a" >> $GITHUB_ENV
 
       - name: Swift Snapshot Download Cache
         id: swift-snapshot-cache
