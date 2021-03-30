@@ -95,8 +95,8 @@ jobs:
 
       - name: Install Swift Snapshot
         run: |
-          curl -sLO "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
-          sudo installer -pkg "${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg" -target /
+          curl -sL -o 'swift-installer.pkg' "https://swift.org/builds/development/xcode/${{ env.SWIFT_SNAPSHOT }}/${{ env.SWIFT_SNAPSHOT }}-osx.pkg"
+          sudo installer -pkg 'swift-installer.pkg' -target /
 
       - name: Update Path
         run: |
