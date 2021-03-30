@@ -38,7 +38,7 @@ jobs:
 
       - name: Swift Test
         run: |
-          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" test --enable-test-discovery
+          "./${{ env.SWIFT_SNAPNAME }}/usr/bin/swift" test --enable-test-discovery -v --configuration debug --enable-test-discovery
 
   watchOS:
     if: false # disabled until we can work around missing XCTest in non-xcodeproj SPM module
@@ -112,8 +112,12 @@ jobs:
 
       - name: Swift Test
         run: |
+          export DYLD_LIBRARY_PATH=$(dirname $(xcrun --toolchain swift --find swift))/../lib/swift/macosx
+          ls -la $DYLD_LIBRARY_PATH
+
           xcrun --toolchain swift swift --version
-          xcrun --toolchain swift swift test
+          xcrun --toolchain swift swift test -Xswiftc -Xfrontend -Xswiftc -enable-experimental-concurrency
+          # xcrun --toolchain swift swift test -v --configuration debug --enable-test-discovery -Xfrontend -enable-experimental-concurrency
 
   macOS11:
     if: false # disabled until Swift-5.5 async/await
