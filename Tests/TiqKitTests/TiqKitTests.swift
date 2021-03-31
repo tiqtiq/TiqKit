@@ -2,9 +2,6 @@
 import XCTest
 @testable import TiqKit
 
-#if canImport(_Concurrency)
-import _Concurrency
-
 final class TiqKitTests: XCTestCase {
     func testAsync() throws {
         XCTAssertEqual(3, awaitAsync(f: { Self.pausing { 1 + 2 } }))
@@ -131,4 +128,3 @@ extension URLRequest {
     }
 }
 #endif // canImport(FoundationNetworking)
-#endif // canImport(_Concurrency)
